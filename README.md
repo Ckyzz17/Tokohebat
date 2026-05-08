@@ -1,175 +1,254 @@
-Dampak Jika “Code Yoga” Dibiarkan di Production
-1. Authentication Bypass (Login Tanpa Password)
-Vulnerability
-Pada versi awal, sistem login hanya mengecek email tanpa memverifikasi password.
-Contoh vulnerable code:
-$user = $this->userRepository->findByEmail(    $request->email);Auth::login($user);
-Dampak
+<p align="center">
+    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-mark/2%20color/1%20PNG/3%20RGB/1%20Full%20Color/laravel-mark-rgb-red.png" width="120" alt="Code Yoga Logo">
+</p>
 
+<h1 align="center">Code Yoga</h1>
 
-Siapa pun dapat login sebagai user lain hanya dengan mengetahui email korban.
+<p align="center">
+Backend Security Improvement & Vulnerability Remediation Project
+</p>
 
+<p align="center">
+<a href="#"><img src="https://img.shields.io/badge/Laravel-10-red" alt="Laravel Version"></a>
+<a href="#"><img src="https://img.shields.io/badge/PHP-8.2-blue" alt="PHP Version"></a>
+<a href="#"><img src="https://img.shields.io/badge/Security-Critical-success" alt="Security Status"></a>
+<a href="#"><img src="https://img.shields.io/badge/License-MIT-green" alt="License"></a>
+</p>
 
-Account takeover sangat mudah dilakukan.
+---
 
+# About Code Yoga
 
-Data pribadi pengguna dapat dicuri.
+**Code Yoga** adalah project backend Laravel yang berfokus pada proses perbaikan dan hardening keamanan aplikasi dari berbagai vulnerability critical yang sebelumnya ditemukan pada sistem authentication dan authorization.
 
+Project ini dibuat sebagai pembelajaran sekaligus implementasi best practice backend security menggunakan Laravel.
 
-Penyerang bisa mengakses fitur internal tanpa autentikasi valid.
+---
 
+# Security Issues Found
 
-Risiko
+Beberapa vulnerability yang ditemukan pada versi awal aplikasi:
 
+- Authentication Bypass
+- Privilege Escalation
+- Plaintext Password Storage
+- Broken Authorization
+- Insecure Credential Handling
 
-Kebocoran data pengguna
+---
 
+# Vulnerability Analysis
 
-Penyalahgunaan akun
+## 1. Authentication Bypass (Login Tanpa Password)
 
+### Vulnerability
 
-Kerugian bisnis
+Pada versi awal, sistem login hanya memverifikasi email tanpa melakukan validasi password.
 
+### Vulnerable Code
 
-Pelanggaran keamanan sistem
+```php
+$user = $this->userRepository->findByEmail($request->email);
 
+Auth::login($user);
+```
 
-Solusi
-Menggunakan:
-Auth::attempt($credentials)
-agar email dan password diverifikasi dengan benar.
+### Dampak
 
-2. Privilege Escalation (Naik Role Jadi Admin)
-Vulnerability
-Role admin diambil langsung dari request URL.
-Contoh vulnerable code:
+- User dapat login hanya dengan mengetahui email korban
+- Account takeover sangat mudah dilakukan
+- Data pengguna dapat dicuri
+- Akses internal sistem dapat ditembus tanpa autentikasi valid
+
+### Risiko
+
+- Data breach
+- Penyalahgunaan akun
+- Kerugian bisnis
+- Pelanggaran keamanan sistem
+
+### Solusi
+
+Menggunakan autentikasi Laravel yang benar:
+
+```php
+Auth::attempt($credentials);
+```
+
+---
+
+## 2. Privilege Escalation (Naik Role Menjadi Admin)
+
+### Vulnerability
+
+Role admin diambil langsung dari request parameter.
+
+### Vulnerable Code
+
+```php
 if ($request->role !== 'admin')
-Dampak
-User biasa dapat mengubah parameter URL:
+```
+
+### Dampak
+
+User biasa dapat mengakses panel admin dengan manipulasi URL:
+
+```bash
 /admin/dashboard?role=admin
-dan langsung mendapatkan akses admin.
-Risiko
+```
 
+### Risiko
 
-Pengambilalihan panel admin
+- Pengambilalihan admin panel
+- Manipulasi data sistem
+- Penghapusan data penting
+- Full system compromise
 
+### Solusi
 
-Manipulasi data sistem
+Role harus berasal dari user yang telah terautentikasi:
 
-
-Penghapusan data penting
-
-
-Perubahan hak akses user
-
-
-Full system compromise
-
-
-Solusi
-Role harus diambil dari user yang sudah terautentikasi:
+```php
 auth()->user()->role
-serta dilindungi middleware authorization.
+```
 
-3. Plaintext Password Storage
-Vulnerability
+Ditambah middleware authorization protection.
+
+---
+
+## 3. Plaintext Password Storage
+
+### Vulnerability
+
 Password disimpan langsung ke database tanpa hashing.
-Contoh vulnerable code:
+
+### Vulnerable Code
+
+```php
 'password' => $request->password
-Dampak
+```
+
+### Dampak
+
 Jika database bocor:
 
+- Seluruh password user dapat langsung dibaca
+- Password dapat digunakan ulang di platform lain
+- Risiko credential stuffing meningkat drastis
 
-seluruh password user langsung terlihat
+### Risiko
 
+- Mass account takeover
+- Identity abuse
+- Financial loss
+- Compliance violation
 
-attacker bisa menggunakan password tersebut di platform lain
+### Solusi
 
+Gunakan hashing password Laravel:
 
-Karena banyak user memakai password yang sama di:
-
-
-Gmail
-
-
-Facebook
-
-
-Instagram
-
-
-Mobile banking
-
-
-maka dampaknya bisa meluas ke luar aplikasi.
-Risiko
-
-
-Credential stuffing attack
-
-
-Kebocoran akun massal
-
-
-Penyalahgunaan identitas user
-
-
-Kerugian finansial
-
-
-Pelanggaran compliance/security standard
-
-
-Solusi
-Password wajib di-hash menggunakan:
+```php
 Hash::make($password)
-atau cast Laravel:
+```
+
+atau cast bawaan Laravel:
+
+```php
 'password' => 'hashed'
+```
 
-Kesimpulan
-Ketiga vulnerability pada “Code Yoga” termasuk kategori critical vulnerability karena mempengaruhi:
+---
 
+# Security Improvements
 
-Authentication
+Perbaikan keamanan yang diterapkan pada project:
 
+- Secure Authentication using `Auth::attempt()`
+- Middleware Authorization
+- Role Validation from Database
+- Password Hashing
+- Laravel Sanctum Authentication
+- Secure Session Handling
+- Input Validation
+- Route Protection
 
-Authorization
+---
 
+# Tech Stack
 
-Credential Security
+- Laravel 10
+- PHP 8.2
+- MySQL
+- Laravel Sanctum
+- Eloquent ORM
 
+---
 
-Jika dibiarkan di production, aplikasi berpotensi mengalami:
+# Installation
 
+Clone repository:
 
-account takeover
+```bash
+git clone https://github.com/username/code-yoga.git
+```
 
+Masuk ke project:
 
-data breach
+```bash
+cd code-yoga
+```
 
+Install dependency:
 
-privilege escalation
+```bash
+composer install
+```
 
+Copy environment:
 
-system compromise
+```bash
+cp .env.example .env
+```
 
+Generate app key:
 
-Oleh karena itu dilakukan perbaikan menggunakan:
+```bash
+php artisan key:generate
+```
 
+Run migration:
 
-Auth::attempt()
+```bash
+php artisan migrate
+```
 
+Jalankan server:
 
-Middleware authorization
+```bash
+php artisan serve
+```
 
+---
 
-Role validation dari database
+# Security Conclusion
 
+Ketiga vulnerability utama pada aplikasi termasuk kategori **Critical Vulnerability** karena mempengaruhi:
 
-Password hashing
+- Authentication
+- Authorization
+- Credential Security
 
+Jika dibiarkan di production, aplikasi dapat mengalami:
 
-Laravel Sanctum token authentication
+- Account takeover
+- Privilege escalation
+- Data breach
+- Full system compromise
 
+Dengan implementasi security improvement di atas, aplikasi menjadi lebih aman dan lebih sesuai dengan best practice backend security Laravel.
 
-agar aplikasi menjadi lebih aman dan sesuai best practice backend security Laravel.
+---
+
+# License
+
+This project is open-sourced software licensed under the MIT license.
