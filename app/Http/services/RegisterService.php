@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Http\Services;
 
 use Illuminate\Http\Request;
-use App\Repositories\UserRepository;
+use App\Http\Repositories\UserRepository;
 
 class RegisterService
 {
@@ -17,8 +17,6 @@ class RegisterService
             'name' => $request->name,
             'email' => $request->email,
 
-            // BUG FATAL:
-            // password disimpan mentah
             'password' => $request->password
         ]);
 

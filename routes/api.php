@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\RegisterController;
 
 Route::post('/register', [RegisterController::class, 'store']);
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);

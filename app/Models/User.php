@@ -42,7 +42,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            //BUG NOMOR 3
+            // 'password' => 'hashed',
         ];
     }
 }

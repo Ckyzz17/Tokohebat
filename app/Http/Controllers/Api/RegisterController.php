@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Services\RegisterService;
+use App\Http\Controllers\Controller;
+use App\Http\Services\RegisterService;
 
 class RegisterController extends Controller
 {

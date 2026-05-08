@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Http\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Repositories\UserRepository;
+use App\Http\Repositories\UserRepository;
 
 class AuthService
 {
