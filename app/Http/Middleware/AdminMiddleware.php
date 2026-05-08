@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Http\Services;
+namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
 
-class AdminService
+class AdminMiddleware
 {
-       public function dashboard()
+    public function handle(Request $request, Closure $next)
     {
+        // cek login
         if (!auth()->check()) {
 
             return response()->json([
@@ -15,6 +17,9 @@ class AdminService
             ], 401);
         }
 
+        // FIX:
+        // role diambil dari database/session
+        // bukan dari URL
         if (auth()->user()->role !== 'admin') {
 
             return response()->json([
@@ -22,10 +27,6 @@ class AdminService
             ], 403);
         }
 
-        return response()->json([
-            'message' => 'Selamat datang admin',
-            'admin' => auth()->user()
-        ]);
+        return $next($request);
     }
-
 }

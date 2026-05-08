@@ -12,25 +12,31 @@ class AuthService
         protected UserRepository $userRepository
     ) {}
 
-    public function login(Request $request)
+       public function login(Request $request)
     {
-        $user = $this->userRepository->findByEmail(
-            $request->email
-        );
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required']
+        ]);
 
-        if (!$user) {
+        if (!Auth::attempt($credentials)) {
+
             return response()->json([
-                'message' => 'User tidak ditemukan'
-            ], 404);
+                'message' => 'Email atau password salah'
+            ], 401);
         }
 
-        // BUG FATAL:
-        // password tidak dicek sama sekali
-        Auth::login($user);
+        $user = Auth::user();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login berhasil',
+
+            'token' => $token,
+
             'user' => $user
         ]);
     }
+
 }
